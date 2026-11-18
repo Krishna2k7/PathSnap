@@ -60,23 +60,35 @@
         </button>
 
         <!-- Metrics Cards -->
-        <div id="metricsPanel" class="space-y-3 pt-2">
-          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3">
-            <span class="text-xs text-slate-400 block">Route Continuity</span>
-            <span id="metricContinuity" class="text-2xl font-bold text-emerald-400 font-mono">--%</span>
+        <div id="metricsPanel" class="space-y-2.5 pt-2">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Route Continuity</span>
+              <span id="metricContinuity" class="text-xl font-bold text-emerald-400 font-mono">--%</span>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Top-1 Accuracy</span>
+              <span id="metricAccuracy" class="text-xl font-bold text-indigo-400 font-mono">--%</span>
+            </div>
           </div>
-          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3">
-            <span class="text-xs text-slate-400 block">Pointwise Top-1 Accuracy</span>
-            <span id="metricAccuracy" class="text-2xl font-bold text-indigo-400 font-mono">--%</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Candidate Macro F1</span>
+              <span id="metricMacroF1" class="text-base font-semibold text-white font-mono">--</span>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Miss Rate</span>
+              <span id="metricMissRate" class="text-base font-semibold text-amber-400 font-mono">--%</span>
+            </div>
           </div>
-          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
+          <div class="bg-slate-800 border border-slate-700 rounded-lg p-2.5 flex justify-between items-center">
             <div>
-              <span class="text-xs text-slate-400 block">Inference Time</span>
-              <span id="metricLatency" class="text-lg font-semibold text-white font-mono">-- ms</span>
+              <span class="text-[11px] text-slate-400 block font-medium">Inference Latency</span>
+              <span id="metricLatency" class="text-sm font-semibold text-white font-mono">-- ms</span>
             </div>
             <div>
-              <span class="text-xs text-slate-400 block">Decoded Arcs</span>
-              <span id="metricArcs" class="text-lg font-semibold text-white font-mono">--</span>
+              <span class="text-[11px] text-slate-400 block font-medium">Log Loss / Brier</span>
+              <span id="metricLoss" class="text-sm font-semibold text-slate-300 font-mono">-- / --</span>
             </div>
           </div>
         </div>
@@ -96,10 +108,16 @@
   <script>
     var map = L.map('map').setView([43.44, 77.19], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+      attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
+    var gpsLayer = L.layerGroup().addTo(map);
     var routeLayer = L.layerGroup().addTo(map);
+
+    L.control.layers(null, {
+      "Original GPS Points (Blue)": gpsLayer,
+      "Predicted Route (Red)": routeLayer
+    }, { collapsed: false }).addTo(map);
 
     document.getElementById('runBtn').addEventListener('click', async function() {
       const tripId = document.getElementById('tripSelect').value;
@@ -108,18 +126,36 @@
       this.innerText = 'Reconstructing...';
 
       try {
-        const res = await fetch(`http://localhost:8000/reconstruct/${tripId}?model_type=${model}`, { method: 'POST' });
+        const res = await fetch(`/reconstruct/${tripId}?model_type=${model}`, { method: 'POST' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         const data = await res.json();
 
-        document.getElementById('metricContinuity').innerText = data.route_continuity_pct + '%';
-        document.getElementById('metricAccuracy').innerText = (data.pointwise_accuracy_pct || 'N/A') + '%';
+        const m = data.metrics || {};
+        document.getElementById('metricContinuity').innerText = (m.route_continuity_pct != null ? m.route_continuity_pct + '%' : 'N/A');
+        document.getElementById('metricAccuracy').innerText = (m.observation_top1_accuracy_pct != null ? m.observation_top1_accuracy_pct + '%' : 'N/A');
+        document.getElementById('metricMacroF1').innerText = (m.candidate_macro_f1 != null ? m.candidate_macro_f1 : 'N/A');
+        document.getElementById('metricMissRate').innerText = (m.candidate_miss_rate_pct != null ? m.candidate_miss_rate_pct + '%' : 'N/A');
         document.getElementById('metricLatency').innerText = data.inference_time_ms + ' ms';
-        document.getElementById('metricArcs').innerText = data.predicted_path_length;
+        document.getElementById('metricLoss').innerText = (m.log_loss ?? '-') + ' / ' + (m.brier_score ?? '-');
 
+        gpsLayer.clearLayers();
         routeLayer.clearLayers();
-        if (data.predicted_coordinates && data.predicted_coordinates.length > 0) {
-          var poly = L.polyline(data.predicted_coordinates, { color: '#ef4444', weight: 4 }).addTo(routeLayer);
-          map.fitBounds(poly.getBounds());
+
+        const bounds = [];
+        if (data.geometry && data.geometry.gps_coordinates) {
+          data.geometry.gps_coordinates.forEach(pt => {
+            L.circleMarker(pt, { radius: 3, color: '#38bdf8', fillColor: '#0284c7', fillOpacity: 0.8, weight: 1 }).addTo(gpsLayer);
+            bounds.push(pt);
+          });
+        }
+
+        if (data.geometry && data.geometry.predicted_coordinates && data.geometry.predicted_coordinates.length > 0) {
+          var poly = L.polyline(data.geometry.predicted_coordinates, { color: '#ef4444', weight: 4, opacity: 0.9 }).addTo(routeLayer);
+          data.geometry.predicted_coordinates.forEach(pt => bounds.push(pt));
+        }
+
+        if (bounds.length > 0) {
+          map.fitBounds(L.latLngBounds(bounds), { padding: [30, 30] });
         }
       } catch (err) {
         alert('API error or server offline: ' + err.message);
