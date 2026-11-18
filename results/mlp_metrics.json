@@ -1,0 +1,37 @@
+{
+  "model_name": "Deep Residual MLP (256-128-64, BatchNorm, SiLU)",
+  "algorithm_family": "Neural Networks",
+  "key_configuration": {
+    "in_features": 21,
+    "hidden_dims": [
+      256,
+      128,
+      64
+    ],
+    "dropout": 0.15,
+    "lr": 0.0025,
+    "weight_decay": 0.0002,
+    "batch_size": 4096,
+    "epochs": 25
+  },
+  "cv_macro_f1_mean": 0.8674,
+  "cv_macro_f1_std": 0.0173,
+  "cv_top1_macro_f1_mean": 0.8516,
+  "cv_top1_accuracy_pct": 71.21,
+  "cv_log_loss": 0.1693,
+  "train_macro_f1": 0.8905,
+  "train_top1_macro_f1": 0.868,
+  "train_top1_accuracy_pct": 73.82,
+  "train_log_loss": 0.1357,
+  "student_test_top1_accuracy_pct": 81.01,
+  "student_test_macro_f1": 0.8825,
+  "student_test_top1_macro_f1": 0.8868,
+  "student_test_precision_macro": 0.8891,
+  "student_test_recall_macro": 0.8763,
+  "student_test_binary_accuracy_pct": 93.53,
+  "student_test_log_loss": 0.1581,
+  "student_test_route_continuity_pct": 95.8,
+  "cv_total_time_sec": 1296.53,
+  "training_time_sec": 286.68,
+  "inference_time_sec": 0.4281
+}
