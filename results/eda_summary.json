@@ -1,0 +1,127 @@
+{
+  "audit_timestamp": "2026-11-18T11:27:01.942905",
+  "train": {
+    "partition": "train",
+    "trip_count": 80,
+    "all_files_present_pct": 100.0,
+    "total_gps_points": 208417,
+    "gps_points_per_trip": {
+      "min": 361,
+      "max": 19313,
+      "mean": 2605.2,
+      "median": 1529,
+      "std": 3312.3
+    },
+    "nan_or_invalid_values": {
+      "gps_nans": 0,
+      "nodes_nans": 0,
+      "arcs_nans": 0
+    },
+    "temporal_consistency": {
+      "strictly_monotonic_trips": 80,
+      "mean_pct_exactly_1s": 93.84,
+      "mean_pct_irregular_gt1s": 6.16,
+      "trips_with_gaps_gt5s": 45,
+      "max_time_gap_observed_sec": 153064.0
+    },
+    "road_network": {
+      "nodes_per_trip_mean": 24168,
+      "arcs_per_trip_mean": 48461,
+      "mean_graph_components": 39.0,
+      "mean_isolated_nodes": 0.0
+    },
+    "reference_route": {
+      "mean_route_arcs": 391.7,
+      "mean_route_len_km": 27.86,
+      "mean_route_connected_pct": 99.93
+    },
+    "spatial_extent": {
+      "min_lon_global": -100.418538,
+      "max_lon_global": 137.237029,
+      "min_lat_global": -34.640291,
+      "max_lat_global": 61.267258,
+      "utm_zones_used": [
+        32614,
+        32615,
+        32616,
+        32617,
+        32622,
+        32629,
+        32630,
+        32631,
+        32632,
+        32633,
+        32634,
+        32635,
+        32636,
+        32637,
+        32638,
+        32639,
+        32640,
+        32641,
+        32643,
+        32648,
+        32651,
+        32653,
+        32721,
+        32722,
+        32735
+      ]
+    }
+  },
+  "student_test": {
+    "partition": "student_test",
+    "trip_count": 10,
+    "all_files_present_pct": 100.0,
+    "total_gps_points": 19160,
+    "gps_points_per_trip": {
+      "min": 262,
+      "max": 3958,
+      "mean": 1916.0,
+      "median": 1420,
+      "std": 1335.4
+    },
+    "nan_or_invalid_values": {
+      "gps_nans": 0,
+      "nodes_nans": 0,
+      "arcs_nans": 0
+    },
+    "temporal_consistency": {
+      "strictly_monotonic_trips": 10,
+      "mean_pct_exactly_1s": 98.2,
+      "mean_pct_irregular_gt1s": 1.8,
+      "trips_with_gaps_gt5s": 2,
+      "max_time_gap_observed_sec": 210.0
+    },
+    "road_network": {
+      "nodes_per_trip_mean": 9068,
+      "arcs_per_trip_mean": 18504,
+      "mean_graph_components": 22.7,
+      "mean_isolated_nodes": 0.0
+    },
+    "reference_route": {
+      "mean_route_arcs": 347.7,
+      "mean_route_len_km": 24.81,
+      "mean_route_connected_pct": 99.97
+    },
+    "spatial_extent": {
+      "min_lon_global": -93.424337,
+      "max_lon_global": 77.271115,
+      "min_lat_global": 42.645529,
+      "max_lat_global": 61.69959,
+      "utm_zones_used": [
+        32615,
+        32631,
+        32633,
+        32636,
+        32638,
+        32639,
+        32640,
+        32641,
+        32643
+      ]
+    }
+  },
+  "total_dataset_trips": 90,
+  "total_dataset_gps_observations": 227577
+}
