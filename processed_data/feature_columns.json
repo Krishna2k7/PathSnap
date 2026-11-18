@@ -1,0 +1,28 @@
+{
+  "feature_columns": [
+    "perp_dist",
+    "dist_rank",
+    "proj_offset_ratio",
+    "longitudinal_offset",
+    "dist_to_start_node",
+    "dist_to_end_node",
+    "arc_length",
+    "gps_speed",
+    "gps_accel",
+    "time_gap",
+    "heading_diff_deg",
+    "cos_heading_diff",
+    "is_stationary",
+    "speed_vs_length_ratio",
+    "from_node_in_degree",
+    "from_node_out_degree",
+    "to_node_in_degree",
+    "to_node_out_degree",
+    "is_connected_from_prev",
+    "is_same_arc_as_prev",
+    "graph_dist_from_prev"
+  ],
+  "n_features": 21,
+  "top_k": 7,
+  "search_radius_meters": 80.0
+}
