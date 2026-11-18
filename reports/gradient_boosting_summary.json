@@ -1,0 +1,25 @@
+{
+  "model_name": "Gradient Boosting (HistGradientBoosting)",
+  "algorithm_family": "Boosting",
+  "key_configuration": {
+    "learning_rate": 0.08,
+    "max_iter": 150,
+    "max_leaf_nodes": 45,
+    "min_samples_leaf": 30,
+    "l2_regularization": 1.0,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "cv_macro_f1_mean": 0.829734641441906,
+  "cv_macro_f1_std": 0.013363755904001769,
+  "cv_top1_acc_mean": 67.39106540532184,
+  "cv_top1_acc_std": 10.57808466644591,
+  "student_test_macro_f1": 0.8408900923988212,
+  "student_test_binary_f1": 0.719804798698658,
+  "student_test_top1_accuracy": 76.71189979123173,
+  "student_test_candidate_miss_rate": 5.7202505219206685,
+  "student_test_log_loss": 0.1729345022622384,
+  "student_test_brier_score": 0.05042974860276018,
+  "full_training_time_s": 10.652806758880615,
+  "student_test_inference_time_s": 0.24595212936401367
+}

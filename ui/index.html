@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathSnap – Distributed Map-Matching Evaluator UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans">
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-800/80 backdrop-blur border-b border-slate-700 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">PS</div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight text-white">PathSnap</h1>
+        <p class="text-xs text-slate-400">Distributed Map-Matching & Route Reconstruction (Laptop 2 Client)</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        API Connected (Laptop 1)
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    <!-- Sidebar Control Panel -->
+    <aside class="w-full lg:w-80 bg-slate-800/50 border-r border-slate-700 p-5 space-y-5 shrink-0 flex flex-col justify-between">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Evaluation Trip</label>
+          <select id="tripSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="00000007">Trip 00000007 (Student Test)</option>
+            <option value="00000000">Trip 00000000 (Student Test)</option>
+            <option value="00000009">Trip 00000009 (Student Test)</option>
+            <option value="00000040">Trip 00000040 (Student Test)</option>
+            <option value="00000052">Trip 00000052 (Student Test)</option>
+            <option value="00000056">Trip 00000056 (Student Test)</option>
+            <option value="00000065">Trip 00000065 (Student Test)</option>
+            <option value="00000076">Trip 00000076 (Student Test)</option>
+            <option value="00000077">Trip 00000077 (Student Test)</option>
+            <option value="00000091">Trip 00000091 (Student Test)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Model Architecture</label>
+          <select id="modelSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="random_forest">Teammate 2: Random Forest (Bagging)</option>
+            <option value="gradient_boosting">Teammate 3: HistGradientBoosting (Boosting)</option>
+          </select>
+        </div>
+
+        <button id="runBtn" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg text-sm transition shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+          <span>Run Reconstruction</span>
+        </button>
+
+        <!-- Metrics Cards -->
+        <div id="metricsPanel" class="space-y-3 pt-2">
+          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3">
+            <span class="text-xs text-slate-400 block">Route Continuity</span>
+            <span id="metricContinuity" class="text-2xl font-bold text-emerald-400 font-mono">--%</span>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3">
+            <span class="text-xs text-slate-400 block">Pointwise Top-1 Accuracy</span>
+            <span id="metricAccuracy" class="text-2xl font-bold text-indigo-400 font-mono">--%</span>
+          </div>
+          <div class="bg-slate-800 border border-slate-700 rounded-lg p-3 flex justify-between items-center">
+            <div>
+              <span class="text-xs text-slate-400 block">Inference Time</span>
+              <span id="metricLatency" class="text-lg font-semibold text-white font-mono">-- ms</span>
+            </div>
+            <div>
+              <span class="text-xs text-slate-400 block">Decoded Arcs</span>
+              <span id="metricArcs" class="text-lg font-semibold text-white font-mono">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-slate-500 border-t border-slate-700/60 pt-3">
+        Ground-truth labels stay securely server-side on Laptop 1.
+      </div>
+    </aside>
+
+    <!-- Map View -->
+    <main class="flex-1 relative bg-slate-950 flex flex-col">
+      <div id="map" class="w-full h-full min-h-[500px]"></div>
+    </main>
+  </div>
+
+  <script>
+    var map = L.map('map').setView([43.44, 77.19], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var routeLayer = L.layerGroup().addTo(map);
+
+    document.getElementById('runBtn').addEventListener('click', async function() {
+      const tripId = document.getElementById('tripSelect').value;
+      const model = document.getElementById('modelSelect').value;
+      this.disabled = true;
+      this.innerText = 'Reconstructing...';
+
+      try {
+        const res = await fetch(`http://localhost:8000/reconstruct/${tripId}?model_type=${model}`, { method: 'POST' });
+        const data = await res.json();
+
+        document.getElementById('metricContinuity').innerText = data.route_continuity_pct + '%';
+        document.getElementById('metricAccuracy').innerText = (data.pointwise_accuracy_pct || 'N/A') + '%';
+        document.getElementById('metricLatency').innerText = data.inference_time_ms + ' ms';
+        document.getElementById('metricArcs').innerText = data.predicted_path_length;
+
+        routeLayer.clearLayers();
+        if (data.predicted_coordinates && data.predicted_coordinates.length > 0) {
+          var poly = L.polyline(data.predicted_coordinates, { color: '#ef4444', weight: 4 }).addTo(routeLayer);
+          map.fitBounds(poly.getBounds());
+        }
+      } catch (err) {
+        alert('API error or server offline: ' + err.message);
+      } finally {
+        this.disabled = false;
+        this.innerText = 'Run Reconstruction';
+      }
+    });
+  </script>
+</body>
+</html>
