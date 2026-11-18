@@ -1,0 +1,3 @@
+Model,Algorithm_Family,Key_Configuration,CV_Macro_F1_Mean,CV_Macro_F1_Std,Top1_Accuracy,Route_Continuity,Student_Test_Macro_F1,Precision_Macro,Recall_Macro,Log_Loss,Train_Time_s,Inference_Time_s,Confusion_Matrix
+Distance_Weighted_KNN,Instance-Based,"k=35, weights=distance, Minkowski p=2, leaf_size=60",0.8509,0.0167,0.788,0.9187,0.865,0.8772,0.8541,0.2238,0.006,14.771,"[[90938, 3435], [4875, 14207]]"
+RBF_SVM,Kernel-Based,"RBF kernel, C=1.0, gamma=scale, probability=True, balanced",0.8152,0.0197,0.795,0.9085,0.8592,0.8654,0.8534,0.1937,43.831,33.435,"[[90364, 4009], [4785, 14297]]"

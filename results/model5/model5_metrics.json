@@ -1,0 +1,52 @@
+[
+  {
+    "Model": "Distance_Weighted_KNN",
+    "Algorithm_Family": "Instance-Based",
+    "Key_Configuration": "k=35, weights=distance, Minkowski p=2, leaf_size=60",
+    "CV_Macro_F1_Mean": 0.8509,
+    "CV_Macro_F1_Std": 0.0167,
+    "Top1_Accuracy": 0.788,
+    "Route_Continuity": 0.9187,
+    "Student_Test_Macro_F1": 0.865,
+    "Precision_Macro": 0.8772,
+    "Recall_Macro": 0.8541,
+    "Log_Loss": 0.2238,
+    "Train_Time_s": 0.006,
+    "Inference_Time_s": 14.771,
+    "Confusion_Matrix": [
+      [
+        90938,
+        3435
+      ],
+      [
+        4875,
+        14207
+      ]
+    ]
+  },
+  {
+    "Model": "RBF_SVM",
+    "Algorithm_Family": "Kernel-Based",
+    "Key_Configuration": "RBF kernel, C=1.0, gamma=scale, probability=True, balanced",
+    "CV_Macro_F1_Mean": 0.8152,
+    "CV_Macro_F1_Std": 0.0197,
+    "Top1_Accuracy": 0.795,
+    "Route_Continuity": 0.9085,
+    "Student_Test_Macro_F1": 0.8592,
+    "Precision_Macro": 0.8654,
+    "Recall_Macro": 0.8534,
+    "Log_Loss": 0.1937,
+    "Train_Time_s": 43.831,
+    "Inference_Time_s": 33.435,
+    "Confusion_Matrix": [
+      [
+        90364,
+        4009
+      ],
+      [
+        4785,
+        14297
+      ]
+    ]
+  }
+]
