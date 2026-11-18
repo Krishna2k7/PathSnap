@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PathSnap – Two-Laptop Map-Matching Evaluator UI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans">
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between sticky top-0 z-50 gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/25">PS</div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-bold tracking-tight text-white">PathSnap Evaluator</h1>
+          <span class="text-[10px] px-2 py-0.5 rounded-full font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Two-Laptop Demo</span>
+        </div>
+        <p class="text-xs text-slate-400">ML Candidate Scoring + Sequential HMM/Viterbi Route Reconstruction</p>
+      </div>
+    </div>
+
+    <!-- Host Connection & Status Pill -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs">
+        <span class="text-slate-400 mr-1.5 font-medium">Backend:</span>
+        <input id="apiHostInput" type="text" class="bg-transparent text-slate-200 outline-none w-48 font-mono text-xs" />
+        <button id="reconnectBtn" class="ml-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-medium underline">Ping</button>
+      </div>
+      <span id="connectionBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span id="connectionText">Checking Backend...</span>
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Content Layout -->
+  <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
+    <!-- Sidebar Control Panel -->
+    <aside class="w-full lg:w-96 bg-slate-900/70 border-r border-slate-800 p-5 space-y-4 shrink-0 flex flex-col justify-between overflow-y-auto">
+      <div class="space-y-4">
+        <!-- Trip Selector -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400">Evaluation Trip</label>
+            <span id="activePartitionLabel" class="text-[10px] text-indigo-400 font-mono">datasets/student_test</span>
+          </div>
+          <select id="tripSelect" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:ring-2 focus:ring-indigo-500 outline-none font-mono">
+            <option value="00000000">Loading trips...</option>
+          </select>
+        </div>
+
+        <!-- Model Pipeline Selector -->
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Production Pipeline</label>
+          <div class="w-full bg-slate-800/80 border border-slate-700/80 rounded-lg p-2.5 text-xs space-y-1">
+            <div class="font-medium text-emerald-400 flex items-center justify-between">
+              <span>Tuned LightGBM + HMM Viterbi</span>
+              <span class="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono">ACTIVE</span>
+            </div>
+            <p class="text-[11px] text-slate-400">21 metric spatial features + Newson-Krumm transition modeling</p>
+          </div>
+        </div>
+
+        <!-- Run Reconstruction Button -->
+        <button id="runBtn" class="w-full py-2.5 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium rounded-lg text-sm transition shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2">
+          <span id="runBtnText">Run Map-Matching & Reconstruction</span>
+        </button>
+
+        <!-- Evaluation Metrics Panel -->
+        <div id="metricsPanel" class="space-y-2.5 pt-1">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-300">Server Evaluation Metrics</span>
+            <span class="text-[10px] text-slate-500">Evaluated on Laptop 1</span>
+          </div>
+
+          <!-- Primary Metric Cards -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-3">
+              <span class="text-[11px] text-slate-400 block font-medium">Route Continuity</span>
+              <span id="metricContinuity" class="text-xl font-bold text-emerald-400 font-mono">--%</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">Topological arc connectivity</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-3">
+              <span class="text-[11px] text-slate-400 block font-medium">Top-1 Accuracy</span>
+              <span id="metricAccuracy" class="text-xl font-bold text-indigo-400 font-mono">--%</span>
+              <p class="text-[10px] text-slate-500 mt-0.5">Observation-level match</p>
+            </div>
+          </div>
+
+          <!-- Sequence Alignment Cards -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Sequence Edit Dist</span>
+              <span id="metricEditDist" class="text-base font-bold text-white font-mono">--</span>
+              <p class="text-[10px] text-slate-500">Levenshtein vs .route</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Sequence LCS Ratio</span>
+              <span id="metricLCS" class="text-base font-bold text-violet-300 font-mono">--</span>
+              <p class="text-[10px] text-slate-500">Common subsequence</p>
+            </div>
+          </div>
+
+          <!-- ML Candidate Metrics -->
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Candidate Macro F1</span>
+              <span id="metricMacroF1" class="text-sm font-semibold text-white font-mono">--</span>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/70 rounded-lg p-2.5">
+              <span class="text-[11px] text-slate-400 block font-medium">Candidate Miss Rate</span>
+              <span id="metricMissRate" class="text-sm font-semibold text-amber-400 font-mono">--%</span>
+            </div>
+          </div>
+
+          <!-- Latency & Calibration -->
+          <div class="bg-slate-800/50 border border-slate-800 rounded-lg p-2.5 text-xs flex justify-between items-center">
+            <div>
+              <span class="text-[11px] text-slate-400 block">Inference Latency</span>
+              <span id="metricLatency" class="text-sm font-bold text-amber-400 font-mono">-- ms</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[11px] text-slate-400 block">Log Loss / Brier</span>
+              <span id="metricLoss" class="text-xs font-semibold text-slate-300 font-mono">-- / --</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Integrity Security Notice -->
+      <div class="text-[10px] text-slate-500 border-t border-slate-800/80 pt-3 leading-relaxed">
+        <span class="font-semibold text-slate-400 block mb-0.5">🔒 Strict Zero-Leakage Guarantee:</span>
+        Ground-truth <code class="text-indigo-400 font-mono">.route</code> files reside strictly on Laptop 1.
+        Metrics are verified server-side. Zero ground-truth geometries are transmitted over HTTP.
+      </div>
+    </aside>
+
+    <!-- Main Map View -->
+    <main class="flex-1 relative bg-slate-950 flex flex-col">
+      <div id="map" class="w-full h-full min-h-[500px]"></div>
+
+      <!-- Floating Map Legend -->
+      <div class="absolute bottom-6 left-6 z-[1000] bg-slate-900/90 backdrop-blur border border-slate-800 rounded-lg p-3 text-xs shadow-xl space-y-1.5 pointer-events-auto">
+        <div class="font-semibold text-slate-200 text-[11px] border-b border-slate-800 pb-1 mb-1">Map Visualization Layers</div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block border border-sky-300"></span>
+          <span class="text-slate-300">Raw GPS Fixes (Noisy Sensor Points)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="w-4 h-1 bg-rose-500 inline-block rounded"></span>
+          <span class="text-slate-300">Reconstructed Route (HMM / Viterbi Path)</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // 1. Initialize Map
+    var map = L.map('map').setView([56.25, 54.96], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19
+    }).addTo(map);
+
+    var gpsLayer = L.layerGroup().addTo(map);
+    var routeLayer = L.layerGroup().addTo(map);
+
+    L.control.layers(null, {
+      "Raw GPS Observations (Blue Points)": gpsLayer,
+      "HMM/Viterbi Reconstructed Route (Red Polyline)": routeLayer
+    }, { position: 'topright', collapsed: false }).addTo(map);
+
+    // 2. Configure Backend Host
+    const hostInput = document.getElementById('apiHostInput');
+    const defaultHost = window.location.origin.includes('http') ? window.location.origin : 'http://localhost:8000';
+    hostInput.value = localStorage.getItem('pathsnap_backend_url') || defaultHost;
+
+    function getBaseUrl() {
+      return hostInput.value.trim().replace(/\/+$/, '');
+    }
+
+    hostInput.addEventListener('change', function() {
+      localStorage.setItem('pathsnap_backend_url', getBaseUrl());
+      checkHealthAndLoadTrips();
+    });
+
+    document.getElementById('reconnectBtn').addEventListener('click', checkHealthAndLoadTrips);
+
+    // 3. Health Check & Trip Discovery
+    async function checkHealthAndLoadTrips() {
+      const baseUrl = getBaseUrl();
+      const badge = document.getElementById('connectionBadge');
+      const text = document.getElementById('connectionText');
+
+      badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      text.innerText = 'Connecting...';
+
+      try {
+        const res = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(3000) });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+        text.innerText = 'Laptop 1 Connected';
+
+        if (data.active_evaluation_dir) {
+          document.getElementById('activePartitionLabel').innerText = data.active_evaluation_dir;
+        }
+
+        // Fetch Trips
+        const tripsRes = await fetch(`${baseUrl}/trips`, { signal: AbortSignal.timeout(3000) });
+        if (tripsRes.ok) {
+          const tripsData = await tripsRes.json();
+          const tripSelect = document.getElementById('tripSelect');
+          tripSelect.innerHTML = '';
+          (tripsData.trips || []).forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.innerText = `Trip ${t}`;
+            tripSelect.appendChild(opt);
+          });
+        }
+      } catch (err) {
+        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-400 border border-rose-500/20';
+        text.innerText = 'Offline (Check IP & Port)';
+      }
+    }
+
+    // 4. Run Reconstruction
+    document.getElementById('runBtn').addEventListener('click', async function() {
+      const tripId = document.getElementById('tripSelect').value;
+      const baseUrl = getBaseUrl();
+      const btn = this;
+      const btnText = document.getElementById('runBtnText');
+
+      if (!tripId) return;
+
+      btn.disabled = true;
+      btnText.innerText = 'Reconstructing...';
+
+      try {
+        const res = await fetch(`${baseUrl}/reconstruct/${tripId}`, {
+          method: 'POST',
+          signal: AbortSignal.timeout(60000)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || 'HTTP ' + res.status);
+        }
+
+        const data = await res.json();
+        const m = data.metrics || {};
+
+        document.getElementById('metricContinuity').innerText = (m.route_continuity_pct != null ? `${m.route_continuity_pct}%` : 'N/A');
+        document.getElementById('metricAccuracy').innerText = (m.observation_top1_accuracy_pct != null ? `${m.observation_top1_accuracy_pct}%` : 'N/A');
+        document.getElementById('metricEditDist').innerText = (m.sequence_edit_distance != null ? m.sequence_edit_distance : 'N/A');
+        document.getElementById('metricLCS').innerText = (m.sequence_lcs_ratio != null ? m.sequence_lcs_ratio : 'N/A');
+        document.getElementById('metricMacroF1').innerText = (m.candidate_macro_f1 != null ? m.candidate_macro_f1 : 'N/A');
+        document.getElementById('metricMissRate').innerText = (m.candidate_miss_rate_pct != null ? `${m.candidate_miss_rate_pct}%` : 'N/A');
+        document.getElementById('metricLatency').innerText = `${data.inference_time_ms} ms`;
+        document.getElementById('metricLoss').innerText = `${m.log_loss ?? '--'} / ${m.brier_score ?? '--'}`;
+
+        gpsLayer.clearLayers();
+        routeLayer.clearLayers();
+
+        const bounds = [];
+        if (data.geometry && data.geometry.gps_coordinates) {
+          data.geometry.gps_coordinates.forEach((pt, idx) => {
+            L.circleMarker(pt, {
+              radius: 3.5,
+              color: '#0284c7',
+              fillColor: '#38bdf8',
+              fillOpacity: 0.85,
+              weight: 1
+            }).bindPopup(`<b>Observation #${idx}</b><br>Lat: ${pt[0]}<br>Lon: ${pt[1]}`).addTo(gpsLayer);
+            bounds.push(pt);
+          });
+        }
+
+        if (data.geometry && data.geometry.predicted_coordinates && data.geometry.predicted_coordinates.length > 0) {
+          L.polyline(data.geometry.predicted_coordinates, {
+            color: '#f43f5e',
+            weight: 4.5,
+            opacity: 0.95
+          }).bindPopup(`<b>Reconstructed Route</b><br>${data.predicted_arcs ? data.predicted_arcs.length : 0} observations`).addTo(routeLayer);
+          data.geometry.predicted_coordinates.forEach(pt => bounds.push(pt));
+        }
+
+        if (bounds.length > 0) {
+          map.fitBounds(L.latLngBounds(bounds), { padding: [35, 35] });
+        }
+      } catch (err) {
+        alert(`Inference Error: ${err.message}`);
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Run Map-Matching & Reconstruction';
+      }
+    });
+
+    // Auto-connect on load
+    window.addEventListener('DOMContentLoaded', checkHealthAndLoadTrips);
+  </script>
+</body>
+</html>

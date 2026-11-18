@@ -1,0 +1,12 @@
+{
+  "model_name": "PathSnap HMM + Viterbi Sequential Route Decoder",
+  "hyperparameters": {
+    "sigma": 8.0,
+    "beta": 30.0,
+    "alpha": 0.7,
+    "hop_penalty": 2.0,
+    "self_transition_log_prob": 0.7
+  },
+  "tuning_set": "8 representative training trips",
+  "saved_at": "2026-11-18T15:55:46.903172"
+}

@@ -1,0 +1,284 @@
+{
+  "dataset": "datasets/student_test (10 trips)",
+  "hyperparameters": {
+    "sigma": 8.0,
+    "beta": 30.0,
+    "alpha": 0.7,
+    "hop_penalty": 2.0,
+    "self_transition_log_prob": 0.7
+  },
+  "aggregate_comparison": {
+    "observation_top1_accuracy": {
+      "classifier_only": 83.97,
+      "hmm_viterbi": 89.67,
+      "delta": 5.7
+    },
+    "observation_macro_f1": {
+      "classifier_only": 0.9056,
+      "hmm_viterbi": 0.9393,
+      "delta": 0.0338
+    },
+    "route_continuity": {
+      "classifier_only": 91.91,
+      "hmm_viterbi": 97.37,
+      "delta": 5.46
+    },
+    "sequence_edit_distance": {
+      "classifier_only": 375.7,
+      "hmm_viterbi": 55.8,
+      "reduction": 319.9
+    },
+    "sequence_lcs_ratio": {
+      "classifier_only": 0.64,
+      "hmm_viterbi": 0.9092,
+      "delta": 0.2692
+    },
+    "exact_sequence_matches": {
+      "classifier_only": "0/10",
+      "hmm_viterbi": "0/10"
+    },
+    "average_decode_time_ms_per_trip": 1454.32
+  },
+  "per_trip_breakdown": [
+    {
+      "trip_id": "00000000",
+      "n_observations": 2503,
+      "ground_truth_route_length": 179,
+      "classifier_only": {
+        "top1_accuracy": 93.33,
+        "macro_f1": 0.9572,
+        "route_continuity": 96.32,
+        "collapsed_route_length": 322,
+        "exact_match": false,
+        "edit_distance": 159,
+        "lcs_ratio": 0.6667
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 96.24,
+        "macro_f1": 0.9764,
+        "route_continuity": 99.32,
+        "collapsed_route_length": 181,
+        "exact_match": false,
+        "edit_distance": 19,
+        "lcs_ratio": 0.9333,
+        "decode_duration_ms": 1461.95
+      }
+    },
+    {
+      "trip_id": "00000007",
+      "n_observations": 1354,
+      "ground_truth_route_length": 123,
+      "classifier_only": {
+        "top1_accuracy": 89.51,
+        "macro_f1": 0.9328,
+        "route_continuity": 99.33,
+        "collapsed_route_length": 251,
+        "exact_match": false,
+        "edit_distance": 130,
+        "lcs_ratio": 0.6471
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 85.08,
+        "macro_f1": 0.9043,
+        "route_continuity": 99.78,
+        "collapsed_route_length": 123,
+        "exact_match": false,
+        "edit_distance": 4,
+        "lcs_ratio": 0.9756,
+        "decode_duration_ms": 666.41
+      }
+    },
+    {
+      "trip_id": "00000009",
+      "n_observations": 1049,
+      "ground_truth_route_length": 429,
+      "classifier_only": {
+        "top1_accuracy": 83.6,
+        "macro_f1": 0.9088,
+        "route_continuity": 87.98,
+        "collapsed_route_length": 473,
+        "exact_match": false,
+        "edit_distance": 175,
+        "lcs_ratio": 0.7561
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 91.04,
+        "macro_f1": 0.9526,
+        "route_continuity": 94.18,
+        "collapsed_route_length": 370,
+        "exact_match": false,
+        "edit_distance": 87,
+        "lcs_ratio": 0.8711,
+        "decode_duration_ms": 1230.18
+      }
+    },
+    {
+      "trip_id": "00000040",
+      "n_observations": 2995,
+      "ground_truth_route_length": 309,
+      "classifier_only": {
+        "top1_accuracy": 88.78,
+        "macro_f1": 0.9289,
+        "route_continuity": 95.82,
+        "collapsed_route_length": 660,
+        "exact_match": false,
+        "edit_distance": 375,
+        "lcs_ratio": 0.6068
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 94.72,
+        "macro_f1": 0.9667,
+        "route_continuity": 99.37,
+        "collapsed_route_length": 297,
+        "exact_match": false,
+        "edit_distance": 20,
+        "lcs_ratio": 0.967,
+        "decode_duration_ms": 1616.54
+      }
+    },
+    {
+      "trip_id": "00000052",
+      "n_observations": 262,
+      "ground_truth_route_length": 95,
+      "classifier_only": {
+        "top1_accuracy": 95.8,
+        "macro_f1": 0.9753,
+        "route_continuity": 93.87,
+        "collapsed_route_length": 85,
+        "exact_match": false,
+        "edit_distance": 22,
+        "lcs_ratio": 0.8556
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 96.95,
+        "macro_f1": 0.9821,
+        "route_continuity": 95.79,
+        "collapsed_route_length": 79,
+        "exact_match": false,
+        "edit_distance": 19,
+        "lcs_ratio": 0.8736,
+        "decode_duration_ms": 206.07
+      }
+    },
+    {
+      "trip_id": "00000056",
+      "n_observations": 3958,
+      "ground_truth_route_length": 1323,
+      "classifier_only": {
+        "top1_accuracy": 79.56,
+        "macro_f1": 0.8805,
+        "route_continuity": 88.78,
+        "collapsed_route_length": 1580,
+        "exact_match": false,
+        "edit_distance": 600,
+        "lcs_ratio": 0.764
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 79.79,
+        "macro_f1": 0.8819,
+        "route_continuity": 96.16,
+        "collapsed_route_length": 1141,
+        "exact_match": false,
+        "edit_distance": 217,
+        "lcs_ratio": 0.905,
+        "decode_duration_ms": 2396.34
+      }
+    },
+    {
+      "trip_id": "00000065",
+      "n_observations": 768,
+      "ground_truth_route_length": 145,
+      "classifier_only": {
+        "top1_accuracy": 78.26,
+        "macro_f1": 0.8736,
+        "route_continuity": 92.05,
+        "collapsed_route_length": 250,
+        "exact_match": false,
+        "edit_distance": 134,
+        "lcs_ratio": 0.6329
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 82.29,
+        "macro_f1": 0.8972,
+        "route_continuity": 97.39,
+        "collapsed_route_length": 135,
+        "exact_match": false,
+        "edit_distance": 21,
+        "lcs_ratio": 0.9214,
+        "decode_duration_ms": 539.96
+      }
+    },
+    {
+      "trip_id": "00000076",
+      "n_observations": 1486,
+      "ground_truth_route_length": 374,
+      "classifier_only": {
+        "top1_accuracy": 80.75,
+        "macro_f1": 0.8909,
+        "route_continuity": 86.46,
+        "collapsed_route_length": 604,
+        "exact_match": false,
+        "edit_distance": 315,
+        "lcs_ratio": 0.6237
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 93.41,
+        "macro_f1": 0.9654,
+        "route_continuity": 95.62,
+        "collapsed_route_length": 324,
+        "exact_match": false,
+        "edit_distance": 75,
+        "lcs_ratio": 0.8711,
+        "decode_duration_ms": 1323.42
+      }
+    },
+    {
+      "trip_id": "00000077",
+      "n_observations": 3911,
+      "ground_truth_route_length": 268,
+      "classifier_only": {
+        "top1_accuracy": 66.96,
+        "macro_f1": 0.8063,
+        "route_continuity": 91.33,
+        "collapsed_route_length": 1898,
+        "exact_match": false,
+        "edit_distance": 1650,
+        "lcs_ratio": 0.2318
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 84.3,
+        "macro_f1": 0.9082,
+        "route_continuity": 99.21,
+        "collapsed_route_length": 272,
+        "exact_match": false,
+        "edit_distance": 37,
+        "lcs_ratio": 0.9259,
+        "decode_duration_ms": 4190.58
+      }
+    },
+    {
+      "trip_id": "00000091",
+      "n_observations": 874,
+      "ground_truth_route_length": 232,
+      "classifier_only": {
+        "top1_accuracy": 83.18,
+        "macro_f1": 0.9014,
+        "route_continuity": 87.17,
+        "collapsed_route_length": 343,
+        "exact_match": false,
+        "edit_distance": 197,
+        "lcs_ratio": 0.6157
+      },
+      "hmm_viterbi": {
+        "top1_accuracy": 92.91,
+        "macro_f1": 0.9584,
+        "route_continuity": 96.91,
+        "collapsed_route_length": 176,
+        "exact_match": false,
+        "edit_distance": 59,
+        "lcs_ratio": 0.848,
+        "decode_duration_ms": 911.74
+      }
+    }
+  ]
+}

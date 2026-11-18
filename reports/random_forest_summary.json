@@ -1,0 +1,39 @@
+{
+  "model_name": "Random Forest (Bagging Ensemble)",
+  "teammate": "Teammate 2",
+  "algorithm_family": "Ensemble / Bagging",
+  "key_configuration": {
+    "n_estimators": 80,
+    "max_depth": 16,
+    "min_samples_split": 20,
+    "min_samples_leaf": 10,
+    "max_features": "sqrt",
+    "class_weight": "balanced",
+    "n_jobs": -1,
+    "random_state": 42
+  },
+  "feature_importances": {
+    "d_perp": 0.26031106293188977,
+    "proj_ratio": 0.12831647916330363,
+    "heading_diff": 0.10712958411952478,
+    "speed_ratio": 0.018779560468292586,
+    "arc_length": 0.04517029658158888,
+    "from_deg": 0.007550666516462454,
+    "to_deg": 0.007307024987572388,
+    "cand_rank": 0.39676109600544507,
+    "time_delta": 0.0011069650380447305,
+    "gps_speed": 0.027567264187875494
+  },
+  "cv_macro_f1_mean": 0.835050769130793,
+  "cv_macro_f1_std": 0.015219468872325165,
+  "cv_top1_acc_mean": 67.36497211515491,
+  "cv_top1_acc_std": 10.560379284666222,
+  "student_test_macro_f1": 0.8492300216740377,
+  "student_test_binary_f1": 0.7336416843858918,
+  "student_test_top1_accuracy": 76.88413361169101,
+  "student_test_candidate_miss_rate": 5.7202505219206685,
+  "student_test_log_loss": 0.1635622282965957,
+  "student_test_brier_score": 0.04697873848965193,
+  "full_training_time_s": 40.04445791244507,
+  "student_test_inference_time_s": 0.14335131645202637
+}

@@ -1,0 +1,78 @@
+{
+  "metric_comparison": {
+    "cv_macro_f1": {
+      "untuned": 0.8696,
+      "tuned": 0.871,
+      "delta": 0.0014
+    },
+    "cv_log_loss": {
+      "untuned": 0.17218,
+      "tuned": 0.16295,
+      "delta": -0.00923
+    },
+    "student_test_top1_accuracy": {
+      "untuned": 81.05,
+      "tuned": 81.58,
+      "delta": 0.53
+    },
+    "student_test_top1_macro_f1": {
+      "untuned": 0.8871,
+      "tuned": 0.8902,
+      "delta": 0.0031
+    },
+    "student_test_candidate_macro_f1": {
+      "untuned": 0.8818,
+      "tuned": 0.8851,
+      "delta": 0.0033
+    },
+    "student_test_log_loss": {
+      "untuned": 0.16065,
+      "tuned": 0.15138,
+      "delta": -0.00927
+    },
+    "student_test_route_continuity": {
+      "untuned": 91.5,
+      "tuned": 91.91,
+      "delta": 0.41
+    },
+    "student_test_inference_time_sec": {
+      "untuned": 2.001,
+      "tuned": 4.698
+    }
+  },
+  "tuned_student_test_details": {
+    "precision": 0.824,
+    "recall": 0.7927,
+    "accuracy": 0.9367,
+    "confusion_matrix": {
+      "tn": 91141,
+      "fp": 3232,
+      "fn": 3955,
+      "tp": 15127
+    },
+    "per_trip_continuity": {
+      "00000000": 96.32,
+      "00000007": 99.33,
+      "00000009": 87.98,
+      "00000040": 95.82,
+      "00000052": 93.87,
+      "00000056": 88.78,
+      "00000065": 92.05,
+      "00000076": 86.46,
+      "00000077": 91.33,
+      "00000091": 87.17
+    }
+  },
+  "best_hyperparameters": {
+    "num_leaves": 94,
+    "max_depth": 8,
+    "learning_rate": 0.03682106743495673,
+    "n_estimators": 459,
+    "min_child_samples": 94,
+    "subsample": 0.7590602526122234,
+    "colsample_bytree": 0.7277818649396152,
+    "reg_alpha": 0.00011431541785080484,
+    "reg_lambda": 2.4155029533371577
+  },
+  "optuna_search_time_sec": 925.26
+}
